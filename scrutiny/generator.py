@@ -1,26 +1,33 @@
 from dataclasses import dataclass
 import time
 
+
 class PollingTimeout(Exception):
     """This exception is raised when the configured timeout is reached"""
+
     pass
+
 
 @dataclass
 class Context:
-    start_time : float
-    timeout : float
-    current_attempt : int = 0
-    max_attempts : int = None
-    interval : int = None
+    start_time: float
+    timeout: float
+    current_attempt: int = 0
+    max_attempts: int = None
+    interval: int = None
 
     def step(self) -> None:
         self.current_attempt += 1
 
     def timed_out(self) -> bool:
+        """Return True if the elapsed time (compared to NOW)
+        is greater than the configured timeout"""
         return time.time() - self.start_time > self.timeout
 
     def maxed_attempts(self) -> bool:
-        """Return False when there is no maximum attempt configured, or when the current attempt number is greater or equal to the configured target"""
+        """Return False when there is no maximum attempt configured.
+        Return also False when the current attempt number is greater or equal
+        to the configured target"""
         if self.max_attempts is None:
             return False
         return self.current_attempt >= self.max_attempts
@@ -36,11 +43,16 @@ class Polling:
         self._interval = interval
 
     def execute(self) -> None:
-        context = Context(start_time=time.time(), timeout=self._timeout, max_attempts=self._max_attempts, interval=self._interval)
+        context = Context(
+            start_time=time.time(),
+            timeout=self._timeout,
+            max_attempts=self._max_attempts,
+            interval=self._interval,
+        )
         while context.should_continue_iterate():
             context.step()
             yield context
-            
+
             if not context.should_continue_iterate():
                 break
 
