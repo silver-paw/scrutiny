@@ -1,5 +1,6 @@
-from dataclasses import dataclass
 import time
+from dataclasses import dataclass
+from typing import Generator, Optional
 
 
 class PollingTimeout(Exception):
@@ -13,8 +14,8 @@ class Context:
     start_time: float
     timeout: float
     current_attempt: int = 0
-    max_attempts: int = None
-    interval: int = None
+    max_attempts: Optional[int] = None
+    interval: Optional[int] = None
 
     def step(self) -> None:
         self.current_attempt += 1
@@ -42,7 +43,7 @@ class Polling:
         self._max_attempts = max_attempts
         self._interval = interval
 
-    def execute(self) -> None:
+    def execute(self) -> Generator:
         context = Context(
             start_time=time.time(),
             timeout=self._timeout,

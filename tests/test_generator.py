@@ -1,12 +1,15 @@
-import unittest
 import time
+import unittest
 
 from scrutiny.generator import Polling, PollingTimeout
 
 
 class TestPolling(unittest.TestCase):
+    """Test the Polling object"""
+
     def test_polling_class_create_instance(self) -> None:
-        poll = Polling()
+        Polling()
+        Polling(3)
 
     def test_polling_class_execute_returns_not_none(self) -> None:
         poll = Polling()
@@ -50,8 +53,8 @@ class TestPolling(unittest.TestCase):
         start_time = time.time()
         for attempt in poll.execute():
             pass
-        self.assertGreaterEqual(time.time() - start_time, (3-1) * 1)
-    
+        self.assertGreaterEqual(time.time() - start_time, (3 - 1) * 1)
+
     def test_polling_interval_default(self) -> None:
         poll = Polling(max_attempts=3)
         start_time = time.time()
@@ -64,7 +67,7 @@ class TestPolling(unittest.TestCase):
         start_time = time.time()
         for attempt in poll.execute():
             pass
-        self.assertGreaterEqual(time.time() - start_time, (5-1) * 2)
+        self.assertGreaterEqual(time.time() - start_time, (5 - 1) * 2)
 
     def test_timeout_10s_with_2s_interval(self):
         poll = Polling(timeout=10, interval=2)
